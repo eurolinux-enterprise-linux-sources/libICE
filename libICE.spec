@@ -1,7 +1,7 @@
 Summary: X.Org X11 ICE runtime library
 Name: libICE
 Version: 1.0.8
-Release: 5%{?dist}
+Release: 7%{?dist}
 License: MIT
 Group: System Environment/Libraries
 URL: http://www.x.org
@@ -61,6 +61,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/ice.pc
 
 %changelog
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.0.8-7
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.0.8-6
+- Mass rebuild 2013-12-27
+
 * Thu Mar 07 2013 Peter Hutterer <peter.hutterer@redhat.com> - 1.0.8-5
 - autoreconf needs xorg-x11-util-macros
 
