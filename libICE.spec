@@ -1,7 +1,7 @@
 Summary: X.Org X11 ICE runtime library
 Name: libICE
-Version: 1.0.8
-Release: 7%{?dist}
+Version: 1.0.9
+Release: 2%{?dist}
 License: MIT
 Group: System Environment/Libraries
 URL: http://www.x.org
@@ -20,7 +20,7 @@ The X.Org X11 ICE (Inter-Client Exchange) runtime library.
 %package devel
 Summary: X.Org X11 ICE development package
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The X.Org X11 ICE (Inter-Client Exchange) development package.
@@ -31,7 +31,7 @@ The X.Org X11 ICE (Inter-Client Exchange) development package.
 %build
 autoreconf -v --install --force
 %configure --disable-static
-make %{?_smp_mflags}
+V=1 make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -41,6 +41,11 @@ make install DESTDIR=$RPM_BUILD_ROOT
 # We intentionally don't ship *.la files
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
+# adding to installed docs in order to avoid using %%doc magic
+for f in AUTHORS ChangeLog COPYING ; do
+    cp -p $f ${RPM_BUILD_ROOT}%{_docdir}/%{name}/${f}
+done
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -48,24 +53,37 @@ rm -rf $RPM_BUILD_ROOT
 %postun -p /sbin/ldconfig
 
 %files
-%defattr(-,root,root,-)
-%doc AUTHORS COPYING ChangeLog
 %{_libdir}/libICE.so.6
 %{_libdir}/libICE.so.6.3.0
+# not using %%doc because of side-effect (#1001256)
+%dir %{_docdir}/%{name}
+%{_docdir}/%{name}/AUTHORS
+%{_docdir}/%{name}/ChangeLog
+%{_docdir}/%{name}/COPYING
 
 %files devel
-%defattr(-,root,root,-)
-%{_docdir}/%{name}
+%{_docdir}/%{name}/*.xml
 %{_includedir}/X11/ICE
 %{_libdir}/libICE.so
 %{_libdir}/pkgconfig/ice.pc
 
 %changelog
-* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.0.8-7
-- Mass rebuild 2014-01-24
+* Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
-* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.0.8-6
-- Mass rebuild 2013-12-27
+* Fri Jul 25 2014 Benjamin Tissoires <benjamin.tissoires@redhat.com> 1.0.9-1
+- libICE 1.0.9
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.8-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Fri Dec 13 2013 Michael Schwendt <mschwendt@fedoraproject.org> - 1.0.8-6
+- Fix duplicate documentation (#1001256) by not using %%doc
+- Turn on verbose build output via V=1 make
+- Use %%?_isa in -devel base package dep
+
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.8-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
 * Thu Mar 07 2013 Peter Hutterer <peter.hutterer@redhat.com> - 1.0.8-5
 - autoreconf needs xorg-x11-util-macros
