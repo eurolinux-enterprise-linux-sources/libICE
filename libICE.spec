@@ -1,12 +1,15 @@
 Summary: X.Org X11 ICE runtime library
 Name: libICE
 Version: 1.0.9
-Release: 2%{?dist}
+Release: 9%{?dist}
 License: MIT
 Group: System Environment/Libraries
 URL: http://www.x.org
 
 Source0: ftp://ftp.x.org/pub/individual/lib/%{name}-%{version}.tar.bz2
+
+Patch0: 0001-Use-getentropy-if-arc4random_buf-is-not-available.patch
+Patch1: 0002-Add-getentropy-emulation-through-syscall.patch
 
 BuildRequires: xorg-x11-util-macros
 BuildRequires: autoconf automake libtool
@@ -28,9 +31,13 @@ The X.Org X11 ICE (Inter-Client Exchange) development package.
 %prep
 %setup -q
 
+%patch0 -p1 -b .cve-2017-2626
+%patch1 -p1 -b .cve-2017-2626
+
 %build
 autoreconf -v --install --force
-%configure --disable-static
+%configure --disable-static \
+	   --without-fop --without-xmlto
 V=1 make %{?_smp_mflags}
 
 %install
@@ -68,6 +75,28 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/ice.pc
 
 %changelog
+* Wed May 03 2017 Benjamin Tissoires <benjamin.tissoires@redhat.com> 1.0.9-9
+- Add upstream patch to not pull libbsd
+- Add custom patch for Fedora 24 & 25
+
+* Wed Mar 01 2017 Benjamin Tissoires <benjamin.tissoires@redhat.com> 1.0.9-8
+- Fix changelog
+
+* Wed Mar 01 2017 Benjamin Tissoires <benjamin.tissoires@redhat.com> 1.0.9-7
+- Use libbsd for randoms (CVE-2017-2626, rhbz#1427715)
+
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Fri Mar 25 2016 Benjamin Tissoires <benjamin.tissoires@redhat.com> 1.0.9-5
+- Force disable documentation generation
+
+* Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
